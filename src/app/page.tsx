@@ -16,6 +16,29 @@ if (!passportApiKey || !passportScorerId) {
 
 export default function Home() {
   const [showPassport, setShowPassport] = useState(false)
+  const [address, setAddress] = useState<string | undefined>()
+
+  const connectWallet = async () => {
+    try {
+      // Check if MetaMask is installed
+      if (typeof window.ethereum === 'undefined') {
+        alert('Please install MetaMask!')
+        return
+      }
+
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      })
+
+      // Get the connected account
+      return accounts[0]
+    } catch (error) {
+      console.error('Error connecting wallet:', error)
+      alert('Failed to connect wallet')
+      throw error
+    }
+  }
 
   const generateSignature = async (message: string) => {
     try {
@@ -66,7 +89,12 @@ export default function Home() {
                 <PassportScoreWidget
                   apiKey={passportApiKey || ''}
                   scorerId={passportScorerId || ''}
-                  address={undefined}
+                  address={address}
+                  // collapseMode="shift"
+                  connectWalletCallback={async () => {
+                    const addr = await connectWallet()
+                    setAddress(addr)
+                  }}
                   generateSignatureCallback={generateSignature}
                   theme={LightTheme}
                 />
