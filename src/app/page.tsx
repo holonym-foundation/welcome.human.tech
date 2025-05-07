@@ -10,6 +10,9 @@ import {
 import { motion } from 'framer-motion'
 import { passportApiKey, passportScorerId } from '@/config'
 import { useAccount, useConnect, useSignMessage } from 'wagmi'
+import { useChainId, useSwitchChain } from 'wagmi'
+import { mainnet } from 'wagmi/chains'
+import { useToast } from '@/hooks/useToast'
 
 if (!passportApiKey || !passportScorerId) {
   throw new Error('Passport API key or scorer ID is not set')
@@ -20,6 +23,9 @@ export default function Home() {
   const { address } = useAccount()
   const { connect, connectors } = useConnect()
   const { signMessageAsync } = useSignMessage()
+  const chainId = useChainId()
+  const { switchChain } = useSwitchChain()
+  const notify = useToast()
 
   const connectWallet = async () => {
     try {
@@ -33,7 +39,7 @@ export default function Home() {
       return address
     } catch (error) {
       console.error('Error connecting wallet:', error)
-      alert('Failed to connect wallet')
+      notify('error', 'Failed to connect wallet. Please try again.')
       throw error
     }
   }
@@ -41,13 +47,32 @@ export default function Home() {
   const generateSignature = async (message: string) => {
     try {
       if (!address) {
+        notify('error', 'No wallet connected')
         throw new Error('No wallet connected')
       }
+
+      // Check if we're on a supported chain
+      if (chainId !== mainnet.id) {
+        notify('info', 'Switching to Ethereum Mainnet...')
+        try {
+          await switchChain({ chainId: mainnet.id })
+        } catch (error) {
+          notify('error', 'Please switch to Ethereum Mainnet in your wallet to continue. You can do this manually in your wallet settings.')
+          throw new Error('Unsupported network')
+        }
+      }
+
       const signature = await signMessageAsync({ message: message })
       return signature
     } catch (error) {
       console.error('Error signing message:', error)
-      alert('Failed to sign message')
+      if (error instanceof Error) {
+        if (error.message === 'Unsupported network') {
+          notify('error', 'Please switch to Ethereum Mainnet in your wallet to continue. You can do this manually in your wallet settings.')
+        } else {
+          notify('error', 'Failed to sign message. Please try again.')
+        }
+      }
       throw error
     }
   }
