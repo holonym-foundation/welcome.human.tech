@@ -9,6 +9,7 @@ import {
 } from '@passportxyz/passport-embed'
 import { motion } from 'framer-motion'
 import { passportApiKey, passportScorerId } from '@/config'
+import { useAccount, useConnect, useSignMessage } from 'wagmi'
 
 if (!passportApiKey || !passportScorerId) {
   throw new Error('Passport API key or scorer ID is not set')
@@ -16,23 +17,20 @@ if (!passportApiKey || !passportScorerId) {
 
 export default function Home() {
   const [showPassport, setShowPassport] = useState(false)
-  const [address, setAddress] = useState<string | undefined>()
+  const { address } = useAccount()
+  const { connect, connectors } = useConnect()
+  const { signMessageAsync } = useSignMessage()
 
   const connectWallet = async () => {
     try {
-      // Check if MetaMask is installed
-      if (typeof window.ethereum === 'undefined') {
-        alert('Please install MetaMask!')
-        return
+      const walletConnectConnector = connectors.find(
+        (connector) => connector.name === 'WalletConnect'
+      )
+      if (!walletConnectConnector) {
+        throw new Error('WalletConnect not available')
       }
-
-      // Request account access
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
-      })
-
-      // Get the connected account
-      return accounts[0]
+      await connect({ connector: walletConnectConnector })
+      return address
     } catch (error) {
       console.error('Error connecting wallet:', error)
       alert('Failed to connect wallet')
@@ -42,27 +40,12 @@ export default function Home() {
 
   const generateSignature = async (message: string) => {
     try {
-      // Check if MetaMask is installed
-      if (typeof window.ethereum === 'undefined') {
-        alert('Please install MetaMask!')
-        return
+      if (!address) {
+        throw new Error('No wallet connected')
       }
-
-      // Request account access if not already connected
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
-      })
-
-      const signerAddress = accounts[0]
-
       const stringToSign = `0x${Buffer.from(message, 'utf8').toString('hex')}`
-      // Sign the message
-      const signature = await window.ethereum.request({
-        method: 'personal_sign',
-        params: [stringToSign, signerAddress],
-      })
-
-      return signature ? signature : ''
+      const signature = await signMessageAsync({ message: stringToSign })
+      return signature
     } catch (error) {
       console.error('Error signing message:', error)
       alert('Failed to sign message')
@@ -93,7 +76,7 @@ export default function Home() {
                   // collapseMode="shift"
                   connectWalletCallback={async () => {
                     const addr = await connectWallet()
-                    setAddress(addr)
+                    // setAddress(addr)
                   }}
                   generateSignatureCallback={generateSignature}
                   theme={LightTheme}
