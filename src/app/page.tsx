@@ -43,8 +43,7 @@ export default function Home() {
       if (!address) {
         throw new Error('No wallet connected')
       }
-      const stringToSign = `0x${Buffer.from(message, 'utf8').toString('hex')}`
-      const signature = await signMessageAsync({ message: stringToSign })
+      const signature = await signMessageAsync({ message: message })
       return signature
     } catch (error) {
       console.error('Error signing message:', error)
