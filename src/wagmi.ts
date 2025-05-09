@@ -1,9 +1,9 @@
 import { http, createConfig } from "wagmi";
-import { sepolia, mainnet, optimism, zksync, polygon } from "wagmi/chains";
+import { sepolia, mainnet, optimism, zksync, polygon, gnosis, baseSepolia } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [sepolia, mainnet, optimism, zksync, polygon],
+  chains: [sepolia, mainnet, optimism, zksync, polygon, gnosis, baseSepolia],
   connectors: [
     injected(),
     walletConnect({
@@ -16,6 +16,8 @@ export const config = createConfig({
     [optimism.id]: http(),
     [zksync.id]: http(),
     [polygon.id]: http(),
+    [gnosis.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
 

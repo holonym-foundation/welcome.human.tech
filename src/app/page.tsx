@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import RootStyle from '@/components/RootStyle'
 import {
   DarkTheme,
@@ -9,10 +9,23 @@ import {
 } from '@passportxyz/passport-embed'
 import { motion } from 'framer-motion'
 import { passportApiKey, passportScorerId } from '@/config'
-import { useAccount, useConnect, useSignMessage } from 'wagmi'
-import { useChainId, useSwitchChain } from 'wagmi'
+import {
+  useAccount,
+  useConnect,
+  useSignMessage,
+  useChainId,
+  useSwitchChain,
+} from 'wagmi'
 import { mainnet } from 'wagmi/chains'
 import { useToast } from '@/hooks/useToast'
+import { useHumanWalletStore } from '@/store/useHumanWalletStore'
+import { ChainSwitcher } from '@/components/ChainSwitcher'
+
+declare global {
+  interface Window {
+    silk: any
+  }
+}
 
 if (!passportApiKey || !passportScorerId) {
   throw new Error('Passport API key or scorer ID is not set')
@@ -20,44 +33,107 @@ if (!passportApiKey || !passportScorerId) {
 
 export default function Home() {
   const [showPassport, setShowPassport] = useState(false)
+
   const { address } = useAccount()
-  const { connect, connectors } = useConnect()
   const { signMessageAsync } = useSignMessage()
+  const { data: signature, signMessage } = useSignMessage()
+
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
+
   const notify = useToast()
 
-  const connectWallet = async () => {
-    try {
-      const walletConnectConnector = connectors.find(
-        (connector) => connector.name === 'WalletConnect'
-      )
-      if (!walletConnectConnector) {
-        throw new Error('WalletConnect not available')
+  const {
+    address: humanWalletAddress,
+    isConnected: isHumanWalletConnected,
+    chainId: humanWalletChainId,
+    login,
+    logout,
+    loginSelector,
+    initializeProvider,
+  } = useHumanWalletStore()
+
+  const { connect, connectors } = useConnect()
+
+  useEffect(() => {
+    initializeProvider()
+  }, [initializeProvider])
+
+  // // Listen for chain changes
+  // useEffect(() => {
+  //   if (window.silk) {
+  //     const handleChainChanged = (chainId: string) => {
+  //       console.log('Chain changed in page (RPC):', chainId)
+  //       const chainIdNumber = parseInt(chainId, 16)
+  //       console.log('Parsed chain ID in page (RPC):', chainIdNumber)
+  //     }
+
+  //     window.silk.on('chainChanged', handleChainChanged)
+
+  //     window.silk.request({
+  //       method: 'wallet_switchEthereumChain',
+  //       params: [{ chainId: '0x1' }],
+  //     }).then((res: unknown) => {
+  //       console.log('wallet_switchEthereumChain', res)
+  //     })
+
+  //     return () => {
+  //       window.silk.removeListener('chainChanged', handleChainChanged)
+  //     }
+  //   }
+  // }, [])
+
+  // console.log({
+  //   humanWalletAddress,
+  //   isHumanWalletConnected,
+  //   // humanWalletChainId,
+  //   address,
+  //   chainId,
+  // })
+
+  // Add effect to handle chain switching
+  useEffect(() => {
+    const switchToMainnet = async () => {
+      if (isHumanWalletConnected && chainId !== mainnet.id) {
+        try {
+          console.log(
+            'Current chain:',
+            chainId,
+            'Switching to mainnet:',
+            mainnet.id
+          )
+          await switchChain({ chainId: mainnet.id })
+          console.log('Successfully switched to mainnet')
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'An unknown error occurred'
+          notify('error', errorMessage)
+        }
       }
-      await connect({ connector: walletConnectConnector })
-      return address
-    } catch (error) {
-      console.error('Error connecting wallet:', error)
-      notify('error', 'Failed to connect wallet. Please try again.')
-      throw error
     }
-  }
+
+    switchToMainnet()
+  }, [isHumanWalletConnected, chainId, switchChain, notify])
 
   const generateSignature = async (message: string) => {
     try {
-      if (!address) {
+      if (!humanWalletAddress) {
         notify('error', 'No wallet connected')
         throw new Error('No wallet connected')
       }
 
-      // Check if we're on a supported chain
+      // Check if we're on a supported chain using wagmi's chainId
       if (chainId !== mainnet.id) {
         notify('info', 'Switching to Ethereum Mainnet...')
         try {
           await switchChain({ chainId: mainnet.id })
+          // Wait for chain switch to complete
+          await new Promise((resolve) => setTimeout(resolve, 1000))
         } catch (error) {
-          notify('error', 'Please switch to Ethereum Mainnet in your wallet to continue. You can do this manually in your wallet settings.')
+          notify(
+            'error',
+            'Please switch to Ethereum Mainnet in your wallet to continue. You can do this manually in your wallet settings.'
+          )
           throw new Error('Unsupported network')
         }
       }
@@ -67,11 +143,7 @@ export default function Home() {
     } catch (error) {
       console.error('Error signing message:', error)
       if (error instanceof Error) {
-        if (error.message === 'Unsupported network') {
-          notify('error', 'Please switch to Ethereum Mainnet in your wallet to continue. You can do this manually in your wallet settings.')
-        } else {
-          notify('error', 'Failed to sign message. Please try again.')
-        }
+        notify('error', 'Failed to sign message. Please try again.')
       }
       throw error
     }
@@ -81,12 +153,21 @@ export default function Home() {
     window.open('https://human.tech/', '_blank', 'noopener,noreferrer')
   }
 
-  const handleVerifyClick = () => {
-    setShowPassport(true)
+  const handleLogin = async () => {
+    try {
+      await login()
+      // await loginSelector(connect, connectors)
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred'
+      notify('error', errorMessage)
+    }
   }
 
   return (
     <>
+      {/* <ChainSwitcher /> */}
+
       <RootStyle>
         {showPassport ? (
           <>
@@ -96,12 +177,8 @@ export default function Home() {
                 <PassportScoreWidget
                   apiKey={passportApiKey || ''}
                   scorerId={passportScorerId || ''}
-                  address={address}
-                  // collapseMode="shift"
-                  connectWalletCallback={async () => {
-                    const addr = await connectWallet()
-                    // setAddress(addr)
-                  }}
+                  address={humanWalletAddress}
+                  connectWalletCallback={handleLogin}
                   generateSignatureCallback={generateSignature}
                   theme={LightTheme}
                 />
@@ -216,7 +293,15 @@ export default function Home() {
 
               <motion.button
                 className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-4 cursor-pointer'
-                onClick={handleVerifyClick}
+                onClick={() => {
+                  setShowPassport(true)
+
+                  // if (isHumanWalletConnected) {
+                  //   logout()
+                  // } else {
+                  //   handleLogin()
+                  // }
+                }}
                 whileHover={{
                   backgroundColor: '#422A05',
                   scale: 1.02,

@@ -3,6 +3,7 @@ import { getConfig } from '@/wagmi'
 import type { Metadata } from 'next'
 import { cookieToInitialState } from 'wagmi'
 import './globals.css'
+import Header from '@/components/Header'
 
 export const metadata: Metadata = {
   title: 'Human Tech',
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={``}>
-        <Providers initialState={initialState}>{children}</Providers>
+        <Providers initialState={initialState}>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   )
