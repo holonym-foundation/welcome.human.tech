@@ -53,7 +53,8 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
       const provider = initSilk({
         useStaging: true,
         config: {
-          // authenticationMethods: ['email','social','wallet'],
+          allowedSocials: ['google', 'twitter', 'discord', 'github'],
+          authenticationMethods: ['email', 'phone', 'wallet', 'social'],
         },
       })
       window.silk = provider
