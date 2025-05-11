@@ -178,7 +178,7 @@ export default function Home() {
                   apiKey={passportApiKey || ''}
                   scorerId={passportScorerId || ''}
                   address={humanWalletAddress}
-                  connectWalletCallback={handleLogin}
+                  // connectWalletCallback={handleLogin}
                   generateSignatureCallback={generateSignature}
                   theme={LightTheme}
                 />
@@ -294,13 +294,11 @@ export default function Home() {
               <motion.button
                 className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-4 cursor-pointer'
                 onClick={() => {
-                  setShowPassport(true)
-
-                  // if (isHumanWalletConnected) {
-                  //   logout()
-                  // } else {
-                  //   handleLogin()
-                  // }
+                  if (isHumanWalletConnected) {
+                    setShowPassport(true)
+                  } else {
+                    handleLogin()
+                  }
                 }}
                 whileHover={{
                   backgroundColor: '#422A05',
@@ -319,7 +317,7 @@ export default function Home() {
                   height={24}
                   className='mr-3'
                 />
-                Verify Humanity
+                {isHumanWalletConnected ? 'Verify Humanity' : 'Connect Wallet'}
               </motion.button>
             </div>
           </>
