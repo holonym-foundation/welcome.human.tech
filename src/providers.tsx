@@ -18,7 +18,7 @@ function WalletStateSync() {
 
   useEffect(() => {
     if (address && isConnected && chainId) {
-      const walletName = connector?.name || 'silk'
+      const walletName = connector?.name || 'Human Wallet'
       syncWagmiState(address, isConnected, chainId, walletName)
     }
   }, [address, isConnected, chainId, connector, syncWagmiState])

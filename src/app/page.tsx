@@ -327,6 +327,8 @@ export default function Home() {
               <motion.button
                 className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-4 cursor-pointer'
                 onClick={() => {
+                  // handleLogin()
+// return
                   if (isHumanWalletConnected) {
                     setShowPassport(true)
                   } else {

@@ -30,10 +30,17 @@ interface HumanWalletState {
     connect: UseConnectReturnType<typeof config>['connect'],
     connectors: readonly Connector[]
   ) => Promise<void>
-  logout: (disconnect: ReturnType<typeof useDisconnect>['disconnect']) => Promise<void>
+  logout: (
+    disconnect: ReturnType<typeof useDisconnect>['disconnect']
+  ) => Promise<void>
   setAddress: (address: string) => void
   setChainId: (chainId: number) => void
-  syncWagmiState: (address: string, isConnected: boolean, chainId: number, walletName: string | null) => void
+  syncWagmiState: (
+    address: string,
+    isConnected: boolean,
+    chainId: number,
+    walletName: string | null
+  ) => void
 
   // Reset the store
   reset: () => void
@@ -62,18 +69,22 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
         },
       })
       window.silk = provider
+      window.ethereum = provider
       set({ provider })
 
-      // ! this does not work with wallet connect or injected even though 
-      // ! metamask provider or wagmi hook works 
-      // provider
-      //   .request({ method: 'eth_requestAccounts' })
-      //   .then((accounts: unknown) => {
-      //     const accountArray = accounts as string[]
-      //     const address = accountArray[0]
-      //     set({ address, isConnected: !!address })
-      //   })
-      
+      // ! this does not work with wallet connect or injected even though
+      // ! metamask provider or wagmi hook works
+      // * this works with silk wallet provider
+      provider
+        .request({ method: 'eth_requestAccounts' })
+        .then((accounts: unknown) => {
+          const accountArray = accounts as string[]
+          const address = accountArray[0]
+          if (address) {
+            set({ address, isConnected: !!address, walletName: 'Human Wallet' })
+          }
+        })
+
       // ! this does not work with silk wallet provider
       // wallet_switchEthereumChain
       // provider.request({
@@ -132,8 +143,11 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     try {
       await provider.login()
       window.ethereum = provider
-      // const accounts = await provider.request({ method: 'eth_requestAccounts' })
-      // set({ address: accounts[0], isConnected: true })
+      const accounts = await provider.request({ method: 'eth_requestAccounts' })
+      if (accounts.length > 0) {
+        console.log('🚀MMM - ~ login: ~ accounts:', accounts)
+        set({ address: accounts[0], isConnected: true, walletName: 'Human Wallet' })
+      }
     } catch (err) {
       console.error('Failed to login:', err)
       const error = err instanceof Error ? err : new Error(String(err))
@@ -148,9 +162,10 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     connectors: readonly Connector[]
   ) => {
     try {
-      const result = await window.silk.loginSelector(window.ethereum)
+      const result = await window.silk.loginSelector()
+      console.log('loginSelector result ', result)
 
-      if (result === 'silk') {
+      if (result === 'silk' || !result) {
         window.ethereum = window.silk
         await get().login()
       } else if (result === 'injected') {
@@ -177,26 +192,28 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     }
   },
 
-  logout: async (disconnect: ReturnType<typeof useDisconnect>['disconnect']) => {
+  logout: async (
+    disconnect: ReturnType<typeof useDisconnect>['disconnect']
+  ) => {
     const { provider } = get()
     if (!provider) return
 
     try {
       // Disconnect from Silk wallet
       await provider.logout()
-      
+
       // Disconnect from wagmi
       if (disconnect) {
         await disconnect()
       }
 
       // Reset the store state
-      set({ 
-        address: '', 
-        isConnected: false, 
-        chainId: null, 
+      set({
+        address: '',
+        isConnected: false,
+        chainId: null,
         walletName: null,
-        provider: null 
+        provider: null,
       })
     } catch (err) {
       console.error('Failed to logout:', err)
@@ -209,8 +226,12 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
 
   setAddress: (address: string) => set({ address, isConnected: !!address }),
   setChainId: (chainId: number) => set({ chainId }),
-  syncWagmiState: (address: string, isConnected: boolean, chainId: number, walletName: string | null) => 
-    set({ address, isConnected, chainId, walletName }),
+  syncWagmiState: (
+    address: string,
+    isConnected: boolean,
+    chainId: number,
+    walletName: string | null
+  ) => set({ address, isConnected, chainId, walletName }),
   reset: () => set(initialState),
 }))
 
