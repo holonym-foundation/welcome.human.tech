@@ -4,6 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
+import { Icon } from "@iconify/react";
+import { silkUrl } from '@/config'
+import { useDisconnect } from 'wagmi'
+
 type WalletDisplayProps = {
   address?: string
   isConnected: boolean
@@ -71,6 +75,11 @@ const WalletDisplay: React.FC<WalletDisplayProps> = ({
     setShowDropdown(false)
   }
 
+  const handleOpenWallet = () => {
+    window.open(silkUrl, '_blank', 'noopener,noreferrer')
+    setShowDropdown(false)
+  }
+
   if (!isConnected) return null
 
   return (
@@ -103,67 +112,19 @@ const WalletDisplay: React.FC<WalletDisplayProps> = ({
           <div
             className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer relative transition-colors duration-150 hover:bg-latest-grey-300'
             onClick={handleCopyAddress}>
-            <div></div>
-            <svg
-              width='16'
-              height='16'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'>
-              <path
-                d='M8 5H6C4.89543 5 4 5.89543 4 7V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V17'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-              <path
-                d='M8 9H6C4.89543 9 4 9.89543 4 11V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V17'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeDasharray='0.2 4'
-                strokeDashoffset='2'
-              />
-              <rect
-                x='8'
-                y='3'
-                width='12'
-                height='12'
-                rx='2'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
+            <Icon icon="ph:copy" width={20} height={20} />
             <span>{copied ? 'Copied!' : 'Copy Address'}</span>
+          </div>
+          <div
+            className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer relative transition-colors duration-150 hover:bg-latest-grey-300'
+            onClick={handleOpenWallet}>
+            <Icon icon="majesticons:open" width={20} height={20} />
+            <span>Open Human Wallet</span>
           </div>
           <div
             className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500 transition-colors duration-150 hover:bg-latest-grey-300'
             onClick={handleDisconnect}>
-            <svg
-              width='16'
-              height='16'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'>
-              <path
-                d='M16 17L21 12M21 12L16 7M21 12H9'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-              <path
-                d='M9 3H7C4.79086 3 3 4.79086 3 7V17C3 19.2091 4.79086 21 7 21H9'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
+            <Icon icon="ph:sign-out" width={20} height={20} />
             <span>Disconnect</span>
           </div>
         </div>
@@ -182,6 +143,8 @@ const Header = () => {
     loginSelector,
     initializeProvider,
   } = useHumanWalletStore()
+
+  const { disconnect } = useDisconnect()
 
   return (
     <header className='w-full px-4 pt-3 flex justify-end items-center relative bg-gray-100'>
@@ -204,10 +167,9 @@ const Header = () => {
           <WalletDisplay
             address={humanWalletAddress}
             isConnected={isHumanWalletConnected}
-            // walletIcon='/assets/svg/humantechsymbollogo.svg'
             walletIcon='/assets/svg/silk-logo.svg'
             networkIcon='/assets/svg/network-logo.svg'
-            onDisconnect={logout}
+            onDisconnect={() => logout(disconnect)}
             walletType='human'
           />
         </div>

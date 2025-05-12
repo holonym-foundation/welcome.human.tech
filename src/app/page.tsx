@@ -20,6 +20,7 @@ import { mainnet } from 'wagmi/chains'
 import { useToast } from '@/hooks/useToast'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
 import { ChainSwitcher } from '@/components/ChainSwitcher'
+import { initSilk } from '@silk-wallet/silk-wallet-sdk'
 
 declare global {
   interface Window {
@@ -34,7 +35,9 @@ if (!passportApiKey || !passportScorerId) {
 export default function Home() {
   const [showPassport, setShowPassport] = useState(false)
 
-  const { address } = useAccount()
+  const { address, isConnected, connector } = useAccount()
+
+
   const { signMessageAsync } = useSignMessage()
   const { data: signature, signMessage } = useSignMessage()
 
@@ -47,6 +50,7 @@ export default function Home() {
     address: humanWalletAddress,
     isConnected: isHumanWalletConnected,
     chainId: humanWalletChainId,
+    walletName: humanWalletName,
     login,
     logout,
     loginSelector,
@@ -82,14 +86,43 @@ export default function Home() {
   //     }
   //   }
   // }, [])
+  
+  // ? Silk Wallet test
+  // useEffect(() => {
+  //   try {
+  //     const provider = initSilk({
+  //       useStaging: true,
+  //       config: {
+  //         allowedSocials: ['google', 'twitter', 'discord', 'github'],
+  //         authenticationMethods: ['email', 'phone', 'wallet', 'social'],
+  //       },
+  //     })
+  //     // // @ts-ignore
+  //     // const provider = window.ethereum
+  //     window.silk = provider
+  //     window.silk
+  //       .request({
+  //         method: 'eth_requestAccounts',
+  //       })
+  //       .then((accounts: any) => {
+  //         console.log('accounts --------------', accounts)
+  //       })
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }, [])
 
-  // console.log({
-  //   humanWalletAddress,
-  //   isHumanWalletConnected,
-  //   // humanWalletChainId,
-  //   address,
-  //   chainId,
-  // })
+
+  console.log({
+    humanWalletAddress,
+    isHumanWalletConnected,
+    humanWalletChainId,
+    humanWalletName,
+    address,
+    chainId,
+    isConnected,
+    walletName: connector?.name,
+  })
 
   // Add effect to handle chain switching
   useEffect(() => {
@@ -155,8 +188,8 @@ export default function Home() {
 
   const handleLogin = async () => {
     try {
-      await login()
-      // await loginSelector(connect, connectors)
+      // await login()
+      await loginSelector(connect, connectors)
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred'
