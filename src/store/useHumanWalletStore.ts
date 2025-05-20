@@ -66,7 +66,7 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
       getAccount()
 
       // Switch to mainnet
-      switchChain(1)
+      // switchChain(1)
 
       // Set up event listeners
       window.silk.on('accountsChanged', (accounts: string[]) => {
