@@ -1,32 +1,12 @@
 'use client'
-import Image from 'next/image'
-import { useEffect, useState } from 'react'
 import RootStyle from '@/components/RootStyle'
-import {
-  DarkTheme,
-  LightTheme,
-  PassportScoreWidget,
-} from '@passportxyz/passport-embed'
-import { motion } from 'framer-motion'
 import { passportApiKey, passportScorerId } from '@/config'
-import {
-  useAccount,
-  useConnect,
-  useSignMessage,
-  useChainId,
-  useSwitchChain,
-} from 'wagmi'
-import { mainnet } from 'wagmi/chains'
 import { useToast } from '@/hooks/useToast'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
-import { ChainSwitcher } from '@/components/ChainSwitcher'
-import { initSilk } from '@silk-wallet/silk-wallet-sdk'
-
-declare global {
-  interface Window {
-    silk: any
-  }
-}
+import { LightTheme, PassportScoreWidget } from '@passportxyz/passport-embed'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { useState } from 'react'
 
 if (!passportApiKey || !passportScorerId) {
   throw new Error('Passport API key or scorer ID is not set')
@@ -35,33 +15,17 @@ if (!passportApiKey || !passportScorerId) {
 export default function Home() {
   const [showPassport, setShowPassport] = useState(false)
 
-  const { address, isConnected, connector } = useAccount()
-
-
-  const { signMessageAsync } = useSignMessage()
-  const { data: signature, signMessage } = useSignMessage()
-
-  const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
-
   const notify = useToast()
 
   const {
-    address: humanWalletAddress,
-    isConnected: isHumanWalletConnected,
-    chainId: humanWalletChainId,
-    walletName: humanWalletName,
+    address,
+    isConnected,
+    chainId,
+    walletName,
     login,
-    logout,
-    loginSelector,
-    initializeProvider,
+    switchChain,
+    signMessage,
   } = useHumanWalletStore()
-
-  const { connect, connectors } = useConnect()
-
-  useEffect(() => {
-    initializeProvider()
-  }, [initializeProvider])
 
   // // Listen for chain changes
   // useEffect(() => {
@@ -74,19 +38,21 @@ export default function Home() {
 
   //     window.silk.on('chainChanged', handleChainChanged)
 
-  //     window.silk.request({
-  //       method: 'wallet_switchEthereumChain',
-  //       params: [{ chainId: '0x1' }],
-  //     }).then((res: unknown) => {
-  //       console.log('wallet_switchEthereumChain', res)
-  //     })
+  //     window.silk
+  //       .request({
+  //         method: 'wallet_switchEthereumChain',
+  //         params: [{ chainId: '0x1' }],
+  //       })
+  //       .then((res: unknown) => {
+  //         console.log('wallet_switchEthereumChain', res)
+  //       })
 
   //     return () => {
   //       window.silk.removeListener('chainChanged', handleChainChanged)
   //     }
   //   }
   // }, [])
-  
+
   // ? Silk Wallet test
   // useEffect(() => {
   //   try {
@@ -112,54 +78,49 @@ export default function Home() {
   //   }
   // }, [])
 
-
   console.log({
-    humanWalletAddress,
-    isHumanWalletConnected,
-    humanWalletChainId,
-    humanWalletName,
     address,
-    chainId,
     isConnected,
-    walletName: connector?.name,
+    chainId,
+    walletName,
   })
 
-  // Add effect to handle chain switching
-  useEffect(() => {
-    const switchToMainnet = async () => {
-      if (isHumanWalletConnected && chainId !== mainnet.id) {
-        try {
-          console.log(
-            'Current chain:',
-            chainId,
-            'Switching to mainnet:',
-            mainnet.id
-          )
-          await switchChain({ chainId: mainnet.id })
-          console.log('Successfully switched to mainnet')
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'An unknown error occurred'
-          notify('error', errorMessage)
-        }
-      }
-    }
+  // // Add effect to handle chain switching
+  // useEffect(() => {
+  //   const switchToMainnet = async () => {
+  //     if (isHumanWalletConnected && chainId !== mainnet.id) {
+  //       try {
+  //         console.log(
+  //           'Current chain:',
+  //           chainId,
+  //           'Switching to mainnet:',
+  //           mainnet.id
+  //         )
+  //         await switchChain({ chainId: mainnet.id })
+  //         console.log('Successfully switched to mainnet')
+  //       } catch (error) {
+  //         const errorMessage =
+  //           error instanceof Error ? error.message : 'An unknown error occurred'
+  //         notify('error', errorMessage)
+  //       }
+  //     }
+  //   }
 
-    switchToMainnet()
-  }, [isHumanWalletConnected, chainId, switchChain, notify])
+  //   switchToMainnet()
+  // }, [isHumanWalletConnected, chainId, switchChain, notify])
 
   const generateSignature = async (message: string) => {
     try {
-      if (!humanWalletAddress) {
+      if (!address) {
         notify('error', 'No wallet connected')
         throw new Error('No wallet connected')
       }
 
       // Check if we're on a supported chain using wagmi's chainId
-      if (chainId !== mainnet.id) {
+      if (Number(chainId) !== 1) {
         notify('info', 'Switching to Ethereum Mainnet...')
         try {
-          await switchChain({ chainId: mainnet.id })
+          await switchChain(1)
           // Wait for chain switch to complete
           await new Promise((resolve) => setTimeout(resolve, 1000))
         } catch (error) {
@@ -171,7 +132,7 @@ export default function Home() {
         }
       }
 
-      const signature = await signMessageAsync({ message: message })
+      const signature = await signMessage(message)
       return signature
     } catch (error) {
       console.error('Error signing message:', error)
@@ -188,8 +149,7 @@ export default function Home() {
 
   const handleLogin = async () => {
     try {
-      // await login()
-      await loginSelector(connect, connectors)
+      await login()
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred'
@@ -210,7 +170,7 @@ export default function Home() {
                 <PassportScoreWidget
                   apiKey={passportApiKey || ''}
                   scorerId={passportScorerId || ''}
-                  address={humanWalletAddress}
+                  address={address}
                   // connectWalletCallback={handleLogin}
                   generateSignatureCallback={generateSignature}
                   theme={LightTheme}
@@ -304,32 +264,32 @@ export default function Home() {
                   <br />
                   Human
                 </h1>
-                <Image
+                {/* <Image
                   src='/assets/svg/verified-human.svg'
                   alt='Verified Human'
                   width={100}
                   height={100}
-                />
+                /> */}
               </div>
 
-              <div className='flex items-center justify-between  gap-2'>
+              <div className='flex items-center justify-between gap-2'>
                 <p className='text-[#0A0A0A] font-suisse text-[16px] font-medium leading-[24px]'>
-                  Begin by verifying your humanity to get a cool badge
+                  Begin by verifying your humanity
                 </p>
-                <Image
+                {/* <Image
                   src='/assets/svg/arrow.svg'
                   alt='Arrow down'
                   width={20}
                   height={20}
-                />
+                /> */}
               </div>
 
               <motion.button
-                className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-4 cursor-pointer'
+                className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-10 cursor-pointer'
                 onClick={() => {
                   // handleLogin()
-// return
-                  if (isHumanWalletConnected) {
+                  // return
+                  if (isConnected) {
                     setShowPassport(true)
                   } else {
                     handleLogin()
@@ -352,7 +312,7 @@ export default function Home() {
                   height={24}
                   className='mr-3'
                 />
-                {isHumanWalletConnected ? 'Verify Humanity' : 'Connect Wallet'}
+                {isConnected ? 'Verify Humanity' : 'Connect Wallet'}
               </motion.button>
             </div>
           </>

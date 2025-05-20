@@ -4,9 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
-import { Icon } from "@iconify/react";
+import { Icon } from '@iconify/react'
 import { silkUrl } from '@/config'
-import { useDisconnect } from 'wagmi'
 
 type WalletDisplayProps = {
   address?: string
@@ -112,19 +111,23 @@ const WalletDisplay: React.FC<WalletDisplayProps> = ({
           <div
             className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer relative transition-colors duration-150 hover:bg-latest-grey-300'
             onClick={handleCopyAddress}>
-            <Icon icon="ph:copy" width={20} height={20} />
+            <Icon icon='ph:copy' width={20} height={20} />
             <span>{copied ? 'Copied!' : 'Copy Address'}</span>
           </div>
-          <div
-            className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer relative transition-colors duration-150 hover:bg-latest-grey-300'
-            onClick={handleOpenWallet}>
-            <Icon icon="majesticons:open" width={20} height={20} />
-            <span>Open Human Wallet</span>
-          </div>
+
+          {window?.silk?.isSilk && (
+            <div
+              className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer relative transition-colors duration-150 hover:bg-latest-grey-300'
+              onClick={handleOpenWallet}>
+              <Icon icon='majesticons:open' width={20} height={20} />
+              <span>Open Human Wallet</span>
+            </div>
+          )}
+
           <div
             className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500 transition-colors duration-150 hover:bg-latest-grey-300'
             onClick={handleDisconnect}>
-            <Icon icon="ph:sign-out" width={20} height={20} />
+            <Icon icon='ph:sign-out' width={20} height={20} />
             <span>Disconnect</span>
           </div>
         </div>
@@ -140,11 +143,11 @@ const Header = () => {
     chainId: humanWalletChainId,
     login,
     logout,
-    loginSelector,
-    initializeProvider,
   } = useHumanWalletStore()
 
-  const { disconnect } = useDisconnect()
+  const handleDisconnect = () => {
+    logout()
+  }
 
   return (
     <header className='w-full px-4 pt-3 flex justify-end items-center relative bg-gray-100'>
@@ -169,7 +172,7 @@ const Header = () => {
             isConnected={isHumanWalletConnected}
             walletIcon='/assets/svg/silk-logo.svg'
             networkIcon='/assets/svg/network-logo.svg'
-            onDisconnect={() => logout(disconnect)}
+            onDisconnect={handleDisconnect}
             walletType='human'
           />
         </div>
