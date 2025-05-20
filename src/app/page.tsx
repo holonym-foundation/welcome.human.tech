@@ -116,7 +116,7 @@ export default function Home() {
         throw new Error('No wallet connected')
       }
 
-      // Check if we're on a supported chain using wagmi's chainId
+      // Check if we're on a supported chain 
       if (Number(chainId) !== 1) {
         notify('info', 'Switching to Ethereum Mainnet...')
         try {
