@@ -41,7 +41,7 @@ const initialState = {
 
 // Utility functions for common operations
 const handleError = (err: unknown, message: string, set: any) => {
-  console.error(message, err)
+  // console.error(message, err)
   const error = err instanceof Error ? err : new Error(String(err))
   set({ error })
   showToast('error', `${message}: ${error.message}`)

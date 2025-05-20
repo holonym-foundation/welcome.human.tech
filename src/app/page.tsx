@@ -151,9 +151,10 @@ export default function Home() {
     try {
       await login()
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'An unknown error occurred'
-      notify('error', errorMessage)
+      console.log('🚀MMM - ~ handleLogin ~ error:', error)
+      // const errorMessage =
+      //   error instanceof Error ? error.message : 'An unknown error occurred'
+      // notify('error', errorMessage)
     }
   }
 
