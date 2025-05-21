@@ -1,6 +1,10 @@
 'use client'
 import RootStyle from '@/components/RootStyle'
-import { passportApiKey, passportScorerId, passportScoreThreshold } from '@/config'
+import {
+  passportApiKey,
+  passportScorerId,
+  passportScoreThreshold,
+} from '@/config'
 import { useToast } from '@/hooks/useToast'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
 import { LightTheme, PassportScoreWidget } from '@passportxyz/passport-embed'
@@ -29,6 +33,7 @@ export default function Home() {
   } = useHumanWalletStore()
 
   const { data: passportData, isLoading, error } = usePassportScore()
+  // const showCheckMark = true
   const showCheckMark = passportData?.score
     ? Number(passportData.score) >= passportScoreThreshold
     : false
@@ -181,87 +186,111 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* Main content section */}
-            <div className='p-8 text-left'>
-              <div className='flex items-center justify-between mb-2'>
-                <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-left'>
-                  Welcome,
+            {showCheckMark ? (
+              <>
+                <div className='flex flex-col items-center justify-center gap-4 p-4'>
+                  <img
+                    src='/assets/svg/VerifiedCheck.svg'
+                    alt='Verified Human'
+                    width={78}
+                    height={78}
+                  />
+                   <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-center'>
+                   Humanity
                   <br />
-                  Human
+                  Verified
                 </h1>
-                {/* <Image
+
+                <motion.button
+                    className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#F5F5F5] text-[#0A0A0A] font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full cursor-pointer'
+                    onClick={() => {
+                     window.open('https://human.tech', '_blank', 'noopener,noreferrer')
+                    }}
+                    whileHover={{
+                      backgroundColor: '#E5E5E5',
+                      scale: 1.02,
+                      transition: { duration: 0.2 },
+                    }}
+                    whileTap={{
+                      scale: 0.98,
+                      backgroundColor: '#E5E5E5',
+                      transition: { duration: 0.1 },
+                    }}>
+                   Check out benefits
+                    <Image
+                      src='/assets/svg/link-arrow.svg'
+                      alt='link arrow'
+                      width={24}
+                      height={24}
+                      className='mr-3'
+                    />
+                  </motion.button>
+                </div>
+               
+              </>
+            ) : (
+              <>
+                {/* Main content section */}
+                <div className='p-8 text-left'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-left'>
+                      Welcome,
+                      <br />
+                      Human
+                    </h1>
+                    {/* <Image
                   src='/assets/svg/verified-human.svg'
                   alt='Verified Human'
                   width={100}
                   height={100}
                 /> */}
-
-                {showCheckMark && (
-                  <div>
-                    <div className='flex items-center justify-center w-12 h-12 rounded-full bg-green-100'>
-                      <svg
-                        width='24'
-                        height='24'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='text-green-600'>
-                        <path
-                          d='M20 6L9 17L4 12'
-                          stroke='currentColor'
-                          strokeWidth='2'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                    </div>
                   </div>
-                )}
-              </div>
 
-              <div className='flex items-center justify-between gap-2'>
+                  <div className='flex items-center justify-between gap-2'>
                 <p className='text-[#0A0A0A] font-suisse text-[16px] font-medium leading-[24px]'>
                   Begin by verifying your humanity
                 </p>
-                {/* <Image
+                <Image
                   src='/assets/svg/arrow.svg'
                   alt='Arrow down'
                   width={20}
                   height={20}
-                /> */}
+                />
               </div>
 
-              <motion.button
-                className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-10 cursor-pointer'
-                onClick={() => {
-                  // handleLogin()
-                  // return
-                  if (isConnected) {
-                    setShowPassport(true)
-                  } else {
-                    handleLogin()
-                  }
-                }}
-                whileHover={{
-                  backgroundColor: '#422A05',
-                  scale: 1.02,
-                  transition: { duration: 0.2 },
-                }}
-                whileTap={{
-                  scale: 0.98,
-                  backgroundColor: '#422A05',
-                  transition: { duration: 0.1 },
-                }}>
-                <Image
-                  src='/assets/svg/user.svg'
-                  alt='User icon'
-                  width={24}
-                  height={24}
-                  className='mr-3'
-                />
-                {isConnected ? 'Verify Humanity' : 'Connect Wallet'}
-              </motion.button>
-            </div>
+                  <motion.button
+                    className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-10 cursor-pointer'
+                    onClick={() => {
+                      // handleLogin()
+                      // return
+                      if (isConnected) {
+                        setShowPassport(true)
+                      } else {
+                        handleLogin()
+                      }
+                    }}
+                    whileHover={{
+                      backgroundColor: '#422A05',
+                      scale: 1.02,
+                      transition: { duration: 0.2 },
+                    }}
+                    whileTap={{
+                      scale: 0.98,
+                      backgroundColor: '#422A05',
+                      transition: { duration: 0.1 },
+                    }}>
+                    <Image
+                      src='/assets/svg/user.svg'
+                      alt='User icon'
+                      width={24}
+                      height={24}
+                      className='mr-3'
+                    />
+                    {isConnected ? 'Verify Humanity' : 'Connect Wallet'}
+                  </motion.button>
+                </div>
+              </>
+            )}
           </>
         )}
       </RootStyle>
