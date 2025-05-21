@@ -97,7 +97,7 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
         walletName: result,
       }
       console.log('🚀MMM - ~ login: ~ state:', state)
-      
+
       set(state)
     } catch (err) {
       handleError(err, 'Failed to login', set)
@@ -139,11 +139,8 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
       const accounts = await requestSilk('eth_requestAccounts')
       const address = (accounts as string[])[0]
 
-      // if (!address) {
-      //   throw new Error('No account found')
-      // }
-
       if (!address) {
+        set({ address: '', isConnected: false })
         return null
       }
 

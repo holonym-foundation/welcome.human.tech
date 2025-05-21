@@ -1,12 +1,13 @@
 'use client'
 import RootStyle from '@/components/RootStyle'
-import { passportApiKey, passportScorerId } from '@/config'
+import { passportApiKey, passportScorerId, passportScoreThreshold } from '@/config'
 import { useToast } from '@/hooks/useToast'
 import { useHumanWalletStore } from '@/store/useHumanWalletStore'
 import { LightTheme, PassportScoreWidget } from '@passportxyz/passport-embed'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useState } from 'react'
+import { usePassportScore } from '@/hooks/usePassportScore'
 
 if (!passportApiKey || !passportScorerId) {
   throw new Error('Passport API key or scorer ID is not set')
@@ -27,87 +28,10 @@ export default function Home() {
     signMessage,
   } = useHumanWalletStore()
 
-  // // Listen for chain changes
-  // useEffect(() => {
-  //   if (window.silk) {
-  //     const handleChainChanged = (chainId: string) => {
-  //       console.log('Chain changed in page (RPC):', chainId)
-  //       const chainIdNumber = parseInt(chainId, 16)
-  //       console.log('Parsed chain ID in page (RPC):', chainIdNumber)
-  //     }
-
-  //     window.silk.on('chainChanged', handleChainChanged)
-
-  //     window.silk
-  //       .request({
-  //         method: 'wallet_switchEthereumChain',
-  //         params: [{ chainId: '0x1' }],
-  //       })
-  //       .then((res: unknown) => {
-  //         console.log('wallet_switchEthereumChain', res)
-  //       })
-
-  //     return () => {
-  //       window.silk.removeListener('chainChanged', handleChainChanged)
-  //     }
-  //   }
-  // }, [])
-
-  // ? Silk Wallet test
-  // useEffect(() => {
-  //   try {
-  //     const provider = initSilk({
-  //       useStaging: true,
-  //       config: {
-  //         allowedSocials: ['google', 'twitter', 'discord', 'github'],
-  //         authenticationMethods: ['email', 'phone', 'wallet', 'social'],
-  //       },
-  //     })
-  //     // // @ts-ignore
-  //     // const provider = window.ethereum
-  //     window.silk = provider
-  //     window.silk
-  //       .request({
-  //         method: 'eth_requestAccounts',
-  //       })
-  //       .then((accounts: any) => {
-  //         console.log('accounts --------------', accounts)
-  //       })
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  // }, [])
-
-  console.log({
-    address,
-    isConnected,
-    chainId,
-    walletName,
-  })
-
-  // // Add effect to handle chain switching
-  // useEffect(() => {
-  //   const switchToMainnet = async () => {
-  //     if (isHumanWalletConnected && chainId !== mainnet.id) {
-  //       try {
-  //         console.log(
-  //           'Current chain:',
-  //           chainId,
-  //           'Switching to mainnet:',
-  //           mainnet.id
-  //         )
-  //         await switchChain({ chainId: mainnet.id })
-  //         console.log('Successfully switched to mainnet')
-  //       } catch (error) {
-  //         const errorMessage =
-  //           error instanceof Error ? error.message : 'An unknown error occurred'
-  //         notify('error', errorMessage)
-  //       }
-  //     }
-  //   }
-
-  //   switchToMainnet()
-  // }, [isHumanWalletConnected, chainId, switchChain, notify])
+  const { data: passportData, isLoading, error } = usePassportScore()
+  const showCheckMark = passportData?.score
+    ? Number(passportData.score) >= passportScoreThreshold
+    : false
 
   const generateSignature = async (message: string) => {
     try {
@@ -116,7 +40,7 @@ export default function Home() {
         throw new Error('No wallet connected')
       }
 
-      // Check if we're on a supported chain 
+      // Check if we're on a supported chain
       if (Number(chainId) !== 1) {
         notify('info', 'Switching to Ethereum Mainnet...')
         try {
@@ -259,7 +183,7 @@ export default function Home() {
 
             {/* Main content section */}
             <div className='p-8 text-left'>
-              <div className='flex items-start justify-between mb-2'>
+              <div className='flex items-center justify-between mb-2'>
                 <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-left'>
                   Welcome,
                   <br />
@@ -271,6 +195,28 @@ export default function Home() {
                   width={100}
                   height={100}
                 /> */}
+
+                {showCheckMark && (
+                  <div>
+                    <div className='flex items-center justify-center w-12 h-12 rounded-full bg-green-100'>
+                      <svg
+                        width='24'
+                        height='24'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='text-green-600'>
+                        <path
+                          d='M20 6L9 17L4 12'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className='flex items-center justify-between gap-2'>
