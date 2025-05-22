@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@passportxyz/passport-embed": "^0.1.5",
-    "@silk-wallet/silk-interface-core": "^0.4.0",
     "@silk-wallet/silk-wallet-sdk": "^0.5.0",
     "@tanstack/react-query": "^5.74.7",
     "@tanstack/react-query-devtools": "^5.74.7",
