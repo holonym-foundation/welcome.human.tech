@@ -4,14 +4,15 @@ export const passportApiKey = process.env.NEXT_PUBLIC_API_KEY
 export const passportScorerId = process.env.NEXT_PUBLIC_SCORER_ID
 export const passportScoreThreshold = 25
 
-export const useStagingSilk = true
+export const useStagingSilk = false
 
 export const silkUrl = useStagingSilk
   ? 'https://staging-silkysignon.com/'
   : 'https://humansignon.com/'
 
 export const silkConfig: InitSilkOptions = {
-  useStaging: true,
+  // useStaging: true,
+  useProd: true,
   config: {
     // darkMode: false,
     allowedSocials: ['google', 'twitter', 'discord', 'github'],
