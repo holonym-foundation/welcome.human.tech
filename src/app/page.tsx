@@ -33,7 +33,7 @@ export default function Home() {
   } = useHumanWalletStore()
 
   const { data: passportData, isLoading, error } = usePassportScore()
-  // const showCheckMark = true
+
   const showCheckMark = passportData?.score
     ? Number(passportData.score) >= passportScoreThreshold
     : false
@@ -80,10 +80,9 @@ export default function Home() {
     try {
       await login()
     } catch (error) {
-      console.log('🚀MMM - ~ handleLogin ~ error:', error)
-      // const errorMessage =
-      //   error instanceof Error ? error.message : 'An unknown error occurred'
-      // notify('error', errorMessage)
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred'
+      notify('error', errorMessage)
     }
   }
 
@@ -195,16 +194,20 @@ export default function Home() {
                     width={78}
                     height={78}
                   />
-                   <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-center'>
-                   Humanity
-                  <br />
-                  Verified
-                </h1>
+                  <h1 className='text-black font-pp-hatton text-[48px] font-semibold leading-[60px] tracking-[-0.96px] text-center'>
+                    Humanity
+                    <br />
+                    Verified
+                  </h1>
 
-                <motion.button
+                  <motion.button
                     className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#F5F5F5] text-[#0A0A0A] font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full cursor-pointer'
                     onClick={() => {
-                     window.open('https://human.tech', '_blank', 'noopener,noreferrer')
+                      window.open(
+                        'https://human.tech',
+                        '_blank',
+                        'noopener,noreferrer'
+                      )
                     }}
                     whileHover={{
                       backgroundColor: '#E5E5E5',
@@ -216,7 +219,7 @@ export default function Home() {
                       backgroundColor: '#E5E5E5',
                       transition: { duration: 0.1 },
                     }}>
-                   Check out benefits
+                    Check out benefits
                     <Image
                       src='/assets/svg/link-arrow.svg'
                       alt='link arrow'
@@ -226,7 +229,6 @@ export default function Home() {
                     />
                   </motion.button>
                 </div>
-               
               </>
             ) : (
               <>
@@ -247,16 +249,16 @@ export default function Home() {
                   </div>
 
                   <div className='flex items-center justify-between gap-2'>
-                <p className='text-[#0A0A0A] font-suisse text-[16px] font-medium leading-[24px]'>
-                  Begin by verifying your humanity
-                </p>
-                <Image
-                  src='/assets/svg/arrow.svg'
-                  alt='Arrow down'
-                  width={20}
-                  height={20}
-                />
-              </div>
+                    <p className='text-[#0A0A0A] font-suisse text-[16px] font-medium leading-[24px]'>
+                      Begin by verifying your humanity
+                    </p>
+                    <Image
+                      src='/assets/svg/arrow.svg'
+                      alt='Arrow down'
+                      width={20}
+                      height={20}
+                    />
+                  </div>
 
                   <motion.button
                     className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#0A0A0A] text-white font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full mt-10 cursor-pointer'

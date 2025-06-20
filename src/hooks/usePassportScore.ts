@@ -45,7 +45,6 @@ const fetchPassportScore = async (address: string): Promise<PassportScore> => {
 export const usePassportScore = () => {
   const { address, isConnected } = useHumanWalletStore()
   const addr = address
-  // const addr = '0xb6b49919f1b8d07465e30e372f1ccd81fda12aa0'
 
   return useQuery({
     queryKey: ['passportScore', addr],
