@@ -150,23 +150,79 @@ const Header = () => {
   }
 
   return (
-    <header className='w-full px-4 pt-3 flex justify-end items-center relative bg-gray-100'>
-      {/* <div className='flex-shrink-0'>
-        <Link
-          href='/'
-          className='hover:opacity-80 transition-opacity duration-200'>
-          <Image
-            src='/assets/svg/human.tech.logo.svg'
-            alt='human.tech'
-            width={120}
-            height={30}
+    <header className='w-full px-2 sm:px-4 pt-3 bg-gray-100'>
+      {/* Mobile Layout */}
+      <div className='block md:hidden'>
+        <div className='flex justify-between items-center mb-3'>
+          <Link
+            href='/'
+            className='hover:opacity-80 transition-opacity duration-200'>
+            <Image
+              src='/assets/svg/human.tech.logo.svg'
+              alt='human.tech'
+              width={100}
+              height={25}
+            />
+          </Link>
+          <WalletDisplay
+            address={humanWalletAddress}
+            isConnected={isHumanWalletConnected}
+            walletIcon='/assets/svg/silk-logo.svg'
+            networkIcon='/assets/svg/network-logo.svg'
+            onDisconnect={handleDisconnect}
+            walletType='human'
           />
-        </Link>
-      </div> */}
+        </div>
+        <nav className='flex justify-center pb-2'>
+          <div className='flex gap-4 items-center'>
+            <Link
+              href='/'
+              className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
+              Human Passport
+            </Link>
+            <Link
+              href='/wallet'
+              className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
+              Human Wallet
+            </Link>
+          </div>
+        </nav>
+      </div>
 
-      {/* Desktop Navigation */}
-      <div className='flex gap-6 items-center'>
-        <div className='flex items-center gap-3'>
+      {/* Desktop Layout */}
+      <div className='hidden md:grid md:grid-cols-3 items-center gap-4'>
+        {/* Logo - Left */}
+        <div className='flex justify-start'>
+          <Link
+            href='/'
+            className='hover:opacity-80 transition-opacity duration-200'>
+            <Image
+              src='/assets/svg/human.tech.logo.svg'
+              alt='human.tech'
+              width={120}
+              height={30}
+            />
+          </Link>
+        </div>
+
+        {/* Navigation Links - Center */}
+        <nav className='flex justify-center'>
+          <div className='flex gap-6 items-center'>
+            <Link
+              href='/'
+              className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
+              Human Passport
+            </Link>
+            <Link
+              href='/wallet'
+              className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
+              Human Wallet
+            </Link>
+          </div>
+        </nav>
+
+        {/* Wallet Display - Right */}
+        <div className='flex justify-end'>
           <WalletDisplay
             address={humanWalletAddress}
             isConnected={isHumanWalletConnected}

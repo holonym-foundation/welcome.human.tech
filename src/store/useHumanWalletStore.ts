@@ -48,7 +48,10 @@ const handleError = (err: unknown, message: string, set: any) => {
   throw error
 }
 
-export const requestHumanWallet = async (method: SILK_METHOD, params?: any[]) => {
+export const requestHumanWallet = async (
+  method: SILK_METHOD,
+  params?: any[]
+) => {
   return window.silk.request({ method, params })
 }
 
@@ -60,10 +63,11 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     try {
       initSilk(silkConfig)
 
-      const { getAccount, switchChain } = get()
+      const { getAccount, getChainId, switchChain } = get()
 
       // Get initial account
       getAccount()
+      getChainId()
 
       // Switch to mainnet
       // switchChain(1)
@@ -116,7 +120,9 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
   switchChain: async (chainId: number) => {
     try {
       const chainIdHex = `0x${chainId.toString(16)}`
-      await requestHumanWallet(SILK_METHOD.wallet_switchEthereumChain, [{ chainId: chainIdHex }])
+      await requestHumanWallet(SILK_METHOD.wallet_switchEthereumChain, [
+        { chainId: chainIdHex },
+      ])
       set({ chainId })
     } catch (err) {
       handleError(err, 'Failed to switch chain', set)
@@ -158,7 +164,10 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
         throw new Error('No wallet connected')
       }
 
-      const signature = await requestHumanWallet(SILK_METHOD.personal_sign, [message, address])
+      const signature = await requestHumanWallet(SILK_METHOD.personal_sign, [
+        message,
+        address,
+      ])
       return signature as string
     } catch (err) {
       return handleError(err, 'Failed to sign message', set)
