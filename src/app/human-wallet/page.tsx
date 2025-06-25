@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useState } from 'react'
 
-export default function WalletPage() {
+export default function HumanWalletPage() {
   const [message, setMessage] = useState('Hello from Human Wallet!')
   const [signature, setSignature] = useState('')
   const [isSigningMessage, setIsSigningMessage] = useState(false)

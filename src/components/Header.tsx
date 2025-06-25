@@ -181,7 +181,7 @@ const Header = () => {
               Human Passport
             </Link>
             <Link
-              href='/wallet'
+              href='/human-wallet'
               className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
               Human Wallet
             </Link>
@@ -214,7 +214,7 @@ const Header = () => {
               Human Passport
             </Link>
             <Link
-              href='/wallet'
+              href='/human-wallet'
               className='text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200'>
               Human Wallet
             </Link>
