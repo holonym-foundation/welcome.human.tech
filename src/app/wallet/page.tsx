@@ -30,7 +30,6 @@ export default function WalletPage() {
       notify('success', 'Wallet connected successfully!')
     } catch (error) {
       console.log('Login error:', error)
-      notify('error', 'Failed to connect wallet')
     }
   }
 
@@ -41,7 +40,6 @@ export default function WalletPage() {
       notify('success', 'Wallet disconnected')
     } catch (error) {
       console.log('Logout error:', error)
-      notify('error', 'Failed to disconnect wallet')
     }
   }
 
@@ -58,7 +56,6 @@ export default function WalletPage() {
       notify('success', 'Message signed successfully!')
     } catch (error) {
       console.log('Sign message error:', error)
-      notify('error', 'Failed to sign message')
     } finally {
       setIsSigningMessage(false)
     }
@@ -70,7 +67,6 @@ export default function WalletPage() {
       notify('success', `Switched to chain ${targetChainId}`)
     } catch (error) {
       console.log('Switch chain error:', error)
-      notify('error', `Failed to switch to chain ${targetChainId}`)
     }
   }
 
