@@ -184,7 +184,7 @@ export default function HumanWalletPage() {
                     onClick={() => handleSwitchChain(1)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}>
-                    Ethereum (1)
+                    Ethereum 
                   </motion.button>
                   <motion.button
                     className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer ${
@@ -195,7 +195,7 @@ export default function HumanWalletPage() {
                     onClick={() => handleSwitchChain(137)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}>
-                    Polygon (137)
+                    Polygon 
                   </motion.button>
                 </div>
               </div>
