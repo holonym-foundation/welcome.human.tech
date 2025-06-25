@@ -94,14 +94,14 @@ export default function WalletPage() {
           transition={{ duration: 0.6 }}>
           <div className='flex justify-center'>
             <Image
-              src='/assets/svg/logo.svg'
+              src='/assets/svg/human.tech.logo.svg'
               alt='Human.tech logo'
               width={120}
               height={40}
               className='mb-4'
             />
           </div>
-          <h1 className='text-black font-pp-hatton text-[32px] font-semibold leading-[40px] tracking-[-0.64px]'>
+          <h1 className='text-black font-pp-hatton text-[32px] font-semibold'>
             Human Wallet Showcase
           </h1>
           <p className='text-gray-600 text-[16px] leading-[24px] max-w-md mx-auto'>
