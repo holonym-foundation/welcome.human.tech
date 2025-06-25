@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { type ReactNode, useEffect } from 'react'
-import { ToastContainer } from 'react-toastify'
+import { Slide, ToastContainer } from 'react-toastify'
 import { useHumanWalletStore } from './store/useHumanWalletStore'
 
 const queryClient = new QueryClient()
@@ -31,7 +31,7 @@ export function Providers({
         {children}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-      <ToastContainer />
+      <ToastContainer transition={Slide} />
     </>
   )
 }
