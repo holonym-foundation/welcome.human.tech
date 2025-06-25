@@ -26,6 +26,7 @@ interface HumanWalletState {
   getChainId: () => Promise<number>
   signMessage: (message: string) => Promise<string>
   getAccount: () => Promise<string | null>
+  getLoginMethod: () => Promise<string | null>
 
   // Reset the store
   reset: () => void
@@ -63,11 +64,12 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     try {
       initSilk(silkConfig)
 
-      const { getAccount, getChainId, switchChain } = get()
+      const { getAccount, getChainId, switchChain, getLoginMethod } = get()
 
-      // Get initial account
+      // Get initial account and login method
       getAccount()
       getChainId()
+      getLoginMethod()
 
       // Switch to mainnet
       // switchChain(1)
@@ -174,6 +176,16 @@ export const humanWalletStore = create<HumanWalletState>((set, get) => ({
     }
   },
 
+  getLoginMethod: async () => {
+    try {
+      const loginMethod = await window.silk.getLoginMethod()
+      set({ walletName: loginMethod })
+      return loginMethod as string | null
+    } catch (err) {
+      return handleError(err, 'Failed to get login method', set)
+    }
+  },
+
   reset: () => set(initialState),
 }))
 
@@ -196,6 +208,7 @@ export const useHumanWalletStore = () =>
       getChainId: state.getChainId,
       signMessage: state.signMessage,
       getAccount: state.getAccount,
+      getLoginMethod: state.getLoginMethod,
       reset: state.reset,
     }))
   )
