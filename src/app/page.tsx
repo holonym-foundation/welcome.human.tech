@@ -73,7 +73,7 @@ export default function Home() {
   }
 
   const handleClickHumanTech = () => {
-    window.open('https://passport.human.tech/ecosystem', '_blank', 'noopener,noreferrer')
+    window.open('https://human.tech/', '_blank', 'noopener,noreferrer')
   }
 
   const handleLogin = async () => {
@@ -204,7 +204,7 @@ export default function Home() {
                     className='flex h-[44px] px-[20px] py-[10px] justify-center items-center gap-[8px] self-stretch rounded-[8px] bg-[#F5F5F5] text-[#0A0A0A] font-[Suisse Intl] text-[16px] font-medium leading-[24px] w-full cursor-pointer'
                     onClick={() => {
                       window.open(
-                        'https://human.tech',
+                        'https://passport.human.tech/ecosystem',
                         '_blank',
                         'noopener,noreferrer'
                       )
