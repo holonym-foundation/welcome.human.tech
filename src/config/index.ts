@@ -12,7 +12,6 @@ export const silkUrl = useStagingSilk
 
 export const silkConfig: InitSilkOptions = {
   // useStaging: true,
-  useProd: true,
   config: {
     // darkMode: false,
     allowedSocials: ['google', 'twitter', 'discord', 'github'],
